@@ -4,16 +4,15 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - RoomLight
   - SamplesInfoPanel
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
-  - 
+  - Grabbable
   - 
   - Suimono_Water
   - Suimono_Depth
