@@ -350,7 +350,7 @@ Transform:
   m_GameObject: {fileID: 249894387907638395}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.37654215, y: 0.4183613, z: -1.1101488}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -479,7 +479,7 @@ MonoBehaviour:
   RotationEitherThumbstick: 0
   RotationAngle: 45
   Speed: 0
-  CameraRig: {fileID: 0}
+  CameraRig: {fileID: 249894387901088135}
 --- !u!136 &9087547143368004070
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -994,7 +994,7 @@ MonoBehaviour:
   EnableRotationDuringAim: 0
   EnableRotationDuringPreTeleport: 0
   EnableRotationDuringPostTeleport: 1
-  TeleportDestinationPrefab: {fileID: 114000013141257940, guid: 1b474618c4fc5f54e8a8b803c8352c7d, type: 3}
+  TeleportDestinationPrefab: {fileID: 2095450950868949876}
   TeleportDestinationLayer: 0
   AimCollisionType: 0
   UseCharacterCollisionData: 0
@@ -1251,7 +1251,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2872920134919542107
 Transform:
   m_ObjectHideFlags: 0
@@ -1282,7 +1282,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2869657009214815069}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1326,7 +1326,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2872920135519874969}
-  - component: {fileID: 2757784283763903151}
+  - component: {fileID: 2095450950868949876}
   m_Layer: 4
   m_Name: TeleportDestination
   m_TagString: Untagged
@@ -1343,14 +1343,14 @@ Transform:
   m_GameObject: {fileID: 2869657010216477305}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.37654215, y: -0.5816387, z: -1.1101488}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2872920138003865563}
   m_Father: {fileID: 4974631901107070783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2757784283763903151
+--- !u!114 &2095450950868949876
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1391,7 +1391,7 @@ Transform:
   m_GameObject: {fileID: 3238711088040361509}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.37654215, y: -0.5816387, z: -1.1101488}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4199,7 +4199,7 @@ GameObject:
   - component: {fileID: 4581287055305268281}
   - component: {fileID: 405065149462460300}
   - component: {fileID: 7426513551155408757}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: CylinderGlow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7004,7 +7004,7 @@ Transform:
   m_GameObject: {fileID: 7123947043062038473}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.37654215, y: 0.5816387, z: 1.1101488}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

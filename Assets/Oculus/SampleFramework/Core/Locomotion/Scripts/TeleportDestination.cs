@@ -63,13 +63,30 @@ public class TeleportDestination : MonoBehaviour
         _updateTeleportDestinationAction = UpdateTeleportDestination;
     }
 
+    private void Awake()
+    {
+        // Try to find the LocomotionTeleport component in the scene if it's not assigned
+        if (LocomotionTeleport == null)
+        {
+            LocomotionTeleport = FindObjectOfType<LocomotionTeleport>();
+        }
+    }
+
+
     public void OnEnable()
     {
-        // Make sure the position and orientation indicators aren't enabled until the destination is updated, otherwise they will flicker at their current location for a frame.
+        // Prevent flickering at the start
         PositionIndicator.gameObject.SetActive(false);
         if (OrientationIndicator != null)
         {
             OrientationIndicator.gameObject.SetActive(false);
+        }
+
+        // Check if LocomotionTeleport is assigned
+        if (LocomotionTeleport == null)
+        {
+            Debug.LogError("LocomotionTeleport is NULL in TeleportDestination! Make sure it is assigned before enabling the object.", this);
+            return;
         }
 
         LocomotionTeleport.UpdateTeleportDestination += _updateTeleportDestinationAction;

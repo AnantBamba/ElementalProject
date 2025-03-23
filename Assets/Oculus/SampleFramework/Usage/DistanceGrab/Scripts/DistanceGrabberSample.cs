@@ -62,10 +62,10 @@ namespace OculusSampleFramework
         // Use this for initialization
         void Start()
         {
-            DebugUIBuilder.instance.AddLabel("Distance Grab Sample");
-            DebugUIBuilder.instance.AddToggle("Use Spherecasting", ToggleSphereCasting, useSpherecast);
-            DebugUIBuilder.instance.AddToggle("Grab Through Walls", ToggleGrabThroughWalls, allowGrabThroughWalls);
-            DebugUIBuilder.instance.Show();
+            //DebugUIBuilder.instance.AddLabel("Distance Grab Sample");
+            //DebugUIBuilder.instance.AddToggle("Use Spherecasting", ToggleSphereCasting, useSpherecast);
+            //DebugUIBuilder.instance.AddToggle("Grab Through Walls", ToggleGrabThroughWalls, allowGrabThroughWalls);
+            //DebugUIBuilder.instance.Show();
 
             // Forcing physics tick rate to match game frame rate, for improved physics in this sample.
             // See comment in OVRGrabber.Update for more information.
