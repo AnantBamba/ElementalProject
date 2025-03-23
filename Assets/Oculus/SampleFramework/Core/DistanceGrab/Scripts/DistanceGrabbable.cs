@@ -69,24 +69,6 @@ namespace OculusSampleFramework
             RefreshCrosshair();
             m_renderer.SetPropertyBlock(m_mpb);
         }
-        public class OrbGlow : MonoBehaviour
-        {
-            public Renderer orbRenderer;
-            private Material orbMaterial;
-            private Color originalEmission;
-
-            void Start()
-            {
-                orbMaterial = orbRenderer.material;
-                originalEmission = orbMaterial.GetColor("_EmissionColor");
-            }
-
-            public void SetOrbState(bool isActive)
-            {
-                Color glowColor = isActive ? Color.cyan * 2f : originalEmission;
-                orbMaterial.SetColor("_EmissionColor", glowColor);
-            }
-        }
 
         void RefreshCrosshair()
         {
