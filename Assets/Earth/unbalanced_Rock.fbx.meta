@@ -8,12 +8,20 @@ ModelImporter:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: M_LandscapePieceDark_basecolor000
+<<<<<<< HEAD
     second: {fileID: 2800000, guid: 2e63835be7adf2d4499ffed835ee9d8a, type: 3}
+=======
+    second: {fileID: 2800000, guid: d224694459cd09f4fb43309f16f46f5c, type: 3}
+>>>>>>> Max
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: M_LandscapePieceDark_normal000
+<<<<<<< HEAD
     second: {fileID: 2800000, guid: c8ca38da70a50c94885b20842bcba02c, type: 3}
+=======
+    second: {fileID: 2800000, guid: d6eab23f8d9047b4ebf079135f177cae, type: 3}
+>>>>>>> Max
   materials:
     materialImportMode: 2
     materialName: 0
