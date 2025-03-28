@@ -475,11 +475,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EnableLinearMovement: 1
   EnableRotation: 1
-  HMDRotatesPlayer: 1
   RotationEitherThumbstick: 0
-  RotationAngle: 45
-  Speed: 0
+  Speed: 2
   CameraRig: {fileID: 249894387901088135}
+  PlayerController: {fileID: 249894387901088153}
 --- !u!136 &9087547143368004070
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -943,7 +942,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1609479207385737155
 Transform:
   m_ObjectHideFlags: 0
@@ -1333,7 +1332,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2872920135519874969
 Transform:
   m_ObjectHideFlags: 0
