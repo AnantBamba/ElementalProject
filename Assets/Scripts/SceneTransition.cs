@@ -5,16 +5,39 @@ using System.Collections;
 
 public class SceneTransition : MonoBehaviour
 {
-    public Image fadeImage;  // Assign the black UI Image in Inspector
-    public float fadeDuration = 2f;  // Adjust duration as needed
-    public string nextScene = "Final";  // Change to your scene name
+    public Image fadeImage;  // Assign the FadeScreen UI Image
+    public float fadeDuration = 1.5f;
 
     void Start()
     {
-        StartCoroutine(FadeOutAndLoadScene());
+        StartCoroutine(FadeIn()); // Fade in at the start of the scene
     }
 
-    IEnumerator FadeOutAndLoadScene()
+    public void LoadScene(string sceneName)
+    {
+        StartCoroutine(Transition(sceneName));
+    }
+
+    IEnumerator Transition(string sceneName)
+    {
+        yield return StartCoroutine(FadeOut()); // Fade to black
+
+        // Load the new scene in the background
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+        while (!asyncLoad.isDone)
+        {
+            yield return null; // Wait until loading is complete
+        }
+
+        yield return new WaitForSeconds(0.5f); // Optional: Small delay before fading in
+
+        yield return StartCoroutine(FadeIn()); // Fade back in
+
+        // Unload the previous scene to free up memory
+        SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    IEnumerator FadeOut()
     {
         float elapsedTime = 0f;
         Color color = fadeImage.color;
@@ -26,7 +49,20 @@ public class SceneTransition : MonoBehaviour
             fadeImage.color = color;
             yield return null;
         }
+    }
 
-        SceneManager.LoadScene(nextScene);
+    IEnumerator FadeIn()
+    {
+        float elapsedTime = 0f;
+        Color color = fadeImage.color;
+        color.a = 1;
+
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            color.a = Mathf.Lerp(1, 0, elapsedTime / fadeDuration);
+            fadeImage.color = color;
+            yield return null;
+        }
     }
 }
