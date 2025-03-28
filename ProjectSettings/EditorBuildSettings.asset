@@ -4,7 +4,10 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/BK/PureNature_Islands/Scenes/Final1.unity
+    guid: f12b02d1852e41d7910106a7ca3c7e13
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: ca3369e2808b4564caf7c55256bb15ef, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 77573762404b7a141bdf5df9f0f8221c, type: 2}
