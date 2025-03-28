@@ -1,5 +1,9 @@
 fileFormatVersion: 2
-guid: 27243b00ae9d82f4999f9d0d0bbdead2
+<<<<<<<< Updated upstream:Assets/SUIMONO - WATER SYSTEM 2/_DEMO/TERRAIN/_TerrainAutoUpgrade/layer_tex_grass_difftex_grass_normb8875f45e9c15431.terrainlayer.meta
+guid: f1795de71bb5bf04b8c6cee598f3f035
+========
+guid: 2640d0354b1b52347bb448d7e481ab85
+>>>>>>>> Stashed changes:Assets/LightingManager_Assets/Skyboxes/Materials/Cubemap.mat.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 8574412962073106934
