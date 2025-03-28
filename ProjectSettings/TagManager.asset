@@ -6,7 +6,9 @@ TagManager:
   tags:
   - FireOrb
   - SamplesInfoPanel
-  - Orb
+  - AirOrb
+  - WaterOrb
+  - EarthOrb
   layers:
   - Default
   - TransparentFX

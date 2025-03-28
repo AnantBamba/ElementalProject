@@ -4843,10 +4843,8 @@ GameObject:
   - component: {fileID: 2492299334266777568}
   - component: {fileID: 9183282311570630675}
   - component: {fileID: 7252032956360888342}
-  - component: {fileID: 8414904630317976214}
   - component: {fileID: 1957663456265336409}
   - component: {fileID: 6702074422675250209}
-  - component: {fileID: 7387683802509620849}
   m_Layer: 6
   m_Name: WaterOrb
   m_TagString: Orb
@@ -4956,19 +4954,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   orbMaterial: {fileID: 2100000, guid: 2dc7746a910cffe45b815a480dd9cb0c, type: 2}
   speed: 0.6
---- !u!114 &8414904630317976214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7277039946730802698}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd1559c860860a343a3f3644ede9fe3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  waterController: {fileID: 0}
 --- !u!114 &1957663456265336409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5009,21 +4994,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &7387683802509620849
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7277039946730802698}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d1a7708e76601b4ea829921c33bc624, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_allowOffhandGrab: 1
-  m_snapPosition: 0
-  m_snapOrientation: 0
-  m_snapOffset: {fileID: 0}
-  m_grabPoints: []
-  m_materialColorField: 

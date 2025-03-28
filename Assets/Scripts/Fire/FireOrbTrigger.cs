@@ -8,10 +8,10 @@ public class FireOrbTrigger : MonoBehaviour
     public bool isFireOrbPlaced = false;
 
     [SerializeField] private LightingManager lightingManager;
-    public float transitionSpeed = 1.0f;
+    public float transitionSpeed = 2.0f;
     private Coroutine timeChangeCoroutine;
 
-    [SerializeField] private Vector3 localSnapPosition = new Vector3(0f, 1.5f, 0f);
+    [SerializeField] private Vector3 localSnapPosition = new Vector3(0f, 1f, 0f);
     [SerializeField] private Vector3 localSnapRotation = new Vector3(0f, 0f, 0f);
 
     private void Start()

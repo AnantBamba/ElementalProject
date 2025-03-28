@@ -6,7 +6,7 @@ public class OrbAltarDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Orb"))
+        if (other.CompareTag("WaterOrb"))
         {
             waterController.SetWaterLevel(true);
         }
@@ -14,7 +14,7 @@ public class OrbAltarDetector : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Orb"))
+        if (other.CompareTag("WaterOrb"))
         {
             waterController.SetWaterLevel(false);
         }
