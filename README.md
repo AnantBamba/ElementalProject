@@ -1,2 +1,0 @@
-# ElementalProject
-IAT 445
