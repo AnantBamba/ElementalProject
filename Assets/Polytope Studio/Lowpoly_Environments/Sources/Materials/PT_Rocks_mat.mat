@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: PT_Rocks_mat
   m_Shader: {fileID: 4800000, guid: cd18bd550ff6630468660d0150eed511, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _DECALSONOFF_ON
   - _DETAILTEXTUREONOFF_ON
@@ -26,11 +28,12 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseTexture:
-        m_Texture: {fileID: 2800000, guid: a195a893970f3ab4990bd06e18a0b308, type: 3}
+        m_Texture: {fileID: 2800000, guid: d224694459cd09f4fb43309f16f46f5c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DecalsTexture:
@@ -76,7 +79,7 @@ Material:
     - _GradientPower: 5.98
     - _GradientPower1: 4.57
     - _OREEMISSIONONOFF: 1
-    - _OreEmissionIntensity: 7.23
+    - _OreEmissionIntensity: 6.07
     - _SNOWONOFF: 0
     - _Smoothness: 0.321
     - _SnowAmount: 0.215
@@ -98,9 +101,9 @@ Material:
     - _DecalsColor: {r: 0.008939266, g: 0, b: 1, a: 0}
     - _GroundColor: {r: 0.26415092, g: 0.23300104, b: 0.23300104, a: 1}
     - _GroundColor1: {r: 0.17009956, g: 0.1484069, b: 0.21698111, a: 1}
-    - _OreColor: {r: 2, g: 0.4804064, b: 0, a: 0}
+    - _OreColor: {r: 0.55727285, g: 0.8199769, b: 1.7633113, a: 0}
     - _OreColor1: {r: 0.0078125, g: 0, b: 0.000778351, a: 0}
-    - _OreEmissionColor: {r: 7.999999, g: 1.3359382, b: 0, a: 0}
+    - _OreEmissionColor: {r: 0.054993182, g: 0, b: 0.2830189, a: 0}
     - _SnowDirection: {r: 0.1, g: 1, b: 0.1, a: 0}
     - _TopColor: {r: 0.7830189, g: 0.7830189, b: 0.7830189, a: 1}
     - _TopColor1: {r: 0.59574103, g: 0.51699895, b: 0.6981132, a: 1}
