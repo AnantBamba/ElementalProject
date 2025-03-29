@@ -7,6 +7,7 @@ public class SceneTransition : MonoBehaviour
 {
     public Image fadeImage;  // Assign the FadeScreen UI Image
     public float fadeDuration = 1.5f;
+    private string sceneToLoad;
 
     void Start()
     {
@@ -15,33 +16,40 @@ public class SceneTransition : MonoBehaviour
 
     public void LoadScene(string sceneName)
     {
-        StartCoroutine(Transition(sceneName));
+        sceneToLoad = sceneName;
+        StartCoroutine(Transition());
     }
 
-    IEnumerator Transition(string sceneName)
+    IEnumerator Transition()
     {
-        yield return StartCoroutine(FadeOut()); // Fade to black
+        yield return StartCoroutine(FadeOut()); // Smooth fade to black
 
-        // Load the new scene in the background
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-        while (!asyncLoad.isDone)
+        // Start loading the scene asynchronously
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+        asyncLoad.allowSceneActivation = false; // Prevent sudden activation
+
+        // Wait until the scene is almost loaded
+        while (asyncLoad.progress < 0.9f)
         {
-            yield return null; // Wait until loading is complete
+            yield return null;
         }
 
-        yield return new WaitForSeconds(0.5f); // Optional: Small delay before fading in
+        // Activate the scene after fading out
+        asyncLoad.allowSceneActivation = true;
 
-        yield return StartCoroutine(FadeIn()); // Fade back in
+        // Give Unity a short delay to stabilize memory before unloading
+        yield return new WaitForSeconds(0.5f);
 
-        // Unload the previous scene to free up memory
+        // Unload the previous scene AFTER the new scene is fully loaded
         SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().buildIndex);
+
+        yield return StartCoroutine(FadeIn()); // Smooth fade in
     }
 
     IEnumerator FadeOut()
     {
         float elapsedTime = 0f;
         Color color = fadeImage.color;
-
         while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.deltaTime;
