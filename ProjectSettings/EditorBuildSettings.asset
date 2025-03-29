@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/IntroductionScene.unity
     guid: 4947fc58040c0a24b9c78357bf0c3371
-  - enabled: 1
+  - enabled: 0
     path: Assets/BK/PureNature_Islands/Scenes/Final1.unity
     guid: f12b02d1852e41d7910106a7ca3c7e13
   - enabled: 1
