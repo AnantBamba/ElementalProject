@@ -6,7 +6,7 @@ public class SimpleCapsuleWithStickMovement : MonoBehaviour
     public bool EnableLinearMovement = true;
     public bool EnableRotation = false;
     public bool RotationEitherThumbstick = false; // Restored variable to prevent errors
-    public float Speed = 2.0f;
+    public float Speed = 10.0f;
     public OVRCameraRig CameraRig;
     public OVRPlayerController PlayerController;
 
