@@ -7,11 +7,18 @@ public class AirOrbTrigger : MonoBehaviour
 {
     public bool isAirOrbPlaced = false;
 
-    [SerializeField] private ParticleSystem fogParticleSystem;  // Reference to the fog particle system
+    [Header("Fog Settings")]
+    [SerializeField] private ParticleSystem fogParticleSystem;
     public float transitionSpeed = 1.0f;
-    private Coroutine timeChangeCoroutine;
     private ParticleSystem.MainModule fogMainModule;
 
+    [Header("Wind Audio Settings")]
+    [SerializeField] private AudioSource windAudioSource;
+    [SerializeField] private float windDelay = 2f;
+    [SerializeField] private float windFadeInDuration = 3f;
+    [SerializeField] private float windFadeOutDuration = 2f;
+
+    [Header("Orb Snap Settings")]
     [SerializeField] private Vector3 localSnapPosition = new Vector3(0f, 1f, 0f);
     [SerializeField] private Vector3 localSnapRotation = new Vector3(0f, 0f, 0f);
 
@@ -22,8 +29,33 @@ public class AirOrbTrigger : MonoBehaviour
             Debug.LogError("Fog Particle System not assigned in the inspector!");
         }
 
-        // Cache the main module of the fog particle system for performance optimization
         fogMainModule = fogParticleSystem.main;
+
+        if (windAudioSource != null)
+        {
+            windAudioSource.volume = 0f;
+            StartCoroutine(DelayedFadeInWind());
+        }
+        else
+        {
+            Debug.LogWarning("Wind AudioSource not assigned!");
+        }
+    }
+
+    private IEnumerator DelayedFadeInWind()
+    {
+        yield return new WaitForSeconds(windDelay);
+        windAudioSource.Play();
+
+        float elapsed = 0f;
+        while (elapsed < windFadeInDuration)
+        {
+            elapsed += Time.deltaTime;
+            windAudioSource.volume = Mathf.Lerp(0f, 1f, elapsed / windFadeInDuration);
+            yield return null;
+        }
+
+        windAudioSource.volume = 1f;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -47,17 +79,14 @@ public class AirOrbTrigger : MonoBehaviour
     {
         if (other.CompareTag("AirOrb"))
         {
-            // Air Orb has fully left the altar, smoothly fade in the fog
-            ReenableFogEffect();
+            FadeInFog();
         }
     }
 
-    private void ReenableFogEffect()
+    private void FadeInFog()
     {
         isAirOrbPlaced = false;
-        Debug.Log("Air Orb has been removed from the Altar!");
-
-        // Smoothly fade in the fog effect
+        Debug.Log("Air Orb removed from the altar.");
         StartCoroutine(SmoothFogTransition(true));
     }
 
@@ -89,20 +118,21 @@ public class AirOrbTrigger : MonoBehaviour
         }
 
         isAirOrbPlaced = true;
-        Debug.Log("Air Orb has been placed on the Altar!");
+        Debug.Log("Air Orb placed on the altar.");
 
-        // Smoothly fade out the fog effect when the orb is placed
+        // Fade out wind sound
+        StartCoroutine(FadeOutWindAudio());
+
+        // Fade out fog
         StartCoroutine(SmoothFogTransition(false));
     }
 
-    // Coroutine to handle smooth fog fade-in and fade-out
     private IEnumerator SmoothFogTransition(bool fadeIn)
     {
-        float targetSize = fadeIn ? 1f : 0f;  // Target size of the fog
+        float targetSize = fadeIn ? 1f : 0f;
         float startTime = Time.time;
         float startSize = fogMainModule.startSize.constant;
 
-        // If fading in, ensure the fog is not stopped completely
         if (fadeIn)
         {
             fogParticleSystem.Play();
@@ -112,17 +142,30 @@ public class AirOrbTrigger : MonoBehaviour
             fogParticleSystem.Stop();
         }
 
-        // Smoothly transition the fog's size (or opacity if you modify other properties)
         while (Mathf.Abs(fogMainModule.startSize.constant - targetSize) > 0.01f)
         {
             float t = (Time.time - startTime) * transitionSpeed;
             float size = Mathf.Lerp(startSize, targetSize, t);
-
-            fogMainModule.startSize = new ParticleSystem.MinMaxCurve(size);  // Update size or opacity
+            fogMainModule.startSize = new ParticleSystem.MinMaxCurve(size);
             yield return null;
         }
 
-        // Finalize the size to ensure it is exactly at the target value
         fogMainModule.startSize = new ParticleSystem.MinMaxCurve(targetSize);
+    }
+
+    private IEnumerator FadeOutWindAudio()
+    {
+        float startVolume = windAudioSource.volume;
+        float elapsed = 0f;
+
+        while (elapsed < windFadeOutDuration)
+        {
+            elapsed += Time.deltaTime;
+            windAudioSource.volume = Mathf.Lerp(startVolume, 0f, elapsed / windFadeOutDuration);
+            yield return null;
+        }
+
+        windAudioSource.Stop();
+        windAudioSource.volume = 0f;
     }
 }
