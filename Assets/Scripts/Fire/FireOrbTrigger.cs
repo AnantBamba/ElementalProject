@@ -9,8 +9,8 @@ public class FireOrbTrigger : MonoBehaviour
 
     [SerializeField] private LightingManager lightingManager;
     [SerializeField] private Terrain terrain;
-    [SerializeField] private TerrainLayer initialTerrainLayer; // Terrain at the start and after orb removal
-    [SerializeField] private TerrainLayer fireTerrainLayer; // Terrain when orb is placed
+    [SerializeField] private TerrainLayer initialTerrainLayer; // Snow terrain layer
+    [SerializeField] private TerrainLayer fireTerrainLayer; // Fire terrain layer
     [SerializeField] private Material mountainMaterial;
     [SerializeField] private Color initialMountainColor = Color.gray;
     [SerializeField] private Color fireOrbMountainColor = Color.red;
@@ -47,10 +47,47 @@ public class FireOrbTrigger : MonoBehaviour
             mountainMaterial.color = initialMountainColor;
         }
 
-        // Ensure the terrain layer is the initial layer at the start of the scene
-        if (!IsTerrainLayerMatching(initialTerrainLayer))
+        // Ensure the terrain layers are set up correctly at the start
+        SetUpInitialTerrainLayers();
+    }
+
+    private void SetUpInitialTerrainLayers()
+    {
+        if (terrain != null)
         {
-            SwitchTerrainLayerToInitial();
+            TerrainData terrainData = terrain.terrainData;
+            TerrainLayer[] layers = terrainData.terrainLayers;
+
+            // Ensure there are at least 7 layers, and swap snow and fire layers
+            if (layers.Length < 7) // We need at least 7 layers to have fire at index 6
+            {
+                Debug.LogError("Terrain does not have enough layers. Adding missing layers...");
+                TerrainLayer[] newLayers = new TerrainLayer[7];
+                newLayers[2] = initialTerrainLayer; // Snow layer at index 2
+                newLayers[6] = fireTerrainLayer; // Fire layer at index 6
+                terrainData.terrainLayers = newLayers;
+            }
+            else
+            {
+                // Ensure fire layer is at index 6 and snow layer is at index 2
+                if (layers[6] != fireTerrainLayer)
+                {
+                    layers[6] = fireTerrainLayer;
+                    Debug.Log("Fire terrain layer set at index 6.");
+                }
+
+                if (layers[2] != initialTerrainLayer)
+                {
+                    layers[2] = initialTerrainLayer;
+                    Debug.Log("Snow terrain layer set at index 2.");
+                }
+
+                terrainData.terrainLayers = layers;
+                terrain.terrainData.RefreshPrototypes(); // Refresh texture prototypes
+                terrain.Flush(); // Force terrain to update
+
+                Debug.Log("Terrain layers initialized.");
+            }
         }
     }
 
@@ -75,7 +112,7 @@ public class FireOrbTrigger : MonoBehaviour
         if (other.CompareTag("FireOrb"))
         {
             ResetTime();
-            SwitchTerrainLayerToInitial();  // Switch back to the initial terrain layer
+            SwapTerrainLayers();  // Swap the terrain layers when orb is removed
             StartColorTransition(initialMountainColor);   // Smoothly transition back to the initial mountain color
         }
     }
@@ -143,44 +180,29 @@ public class FireOrbTrigger : MonoBehaviour
         StartTransition(12f);
 
         // Switch to the fire terrain layer and the fire orb color when orb is placed
-        SwitchTerrainLayerToFire();
+        SwapTerrainLayers();
         StartColorTransition(fireOrbMountainColor);
     }
 
-    private void SwitchTerrainLayerToFire()
+    private void SwapTerrainLayers()
     {
         if (terrain != null)
         {
-            TerrainLayer[] layers = terrain.terrainData.terrainLayers;
-            if (layers.Length > 0)
-            {
-                layers[0] = fireTerrainLayer;
-                terrain.terrainData.terrainLayers = layers;
+            TerrainData terrainData = terrain.terrainData;
+            TerrainLayer[] layers = terrainData.terrainLayers;
 
-                Debug.Log("Terrain layer switched to fire terrain layer.");
-            }
-            else
+            if (layers.Length > 6) // Ensure there are at least 7 layers
             {
-                Debug.LogError("Terrain has no layers assigned.");
-            }
-        }
-    }
+                // Swap the snow layer (index 2) and fire layer (index 6)
+                TerrainLayer tempLayer = layers[2];
+                layers[2] = layers[6];
+                layers[6] = tempLayer;
 
-    private void SwitchTerrainLayerToInitial()
-    {
-        if (terrain != null)
-        {
-            TerrainLayer[] layers = terrain.terrainData.terrainLayers;
-            if (layers.Length > 0)
-            {
-                layers[0] = initialTerrainLayer;
-                terrain.terrainData.terrainLayers = layers;
+                terrainData.terrainLayers = layers;
+                terrain.terrainData.RefreshPrototypes(); // Refresh texture prototypes
+                terrain.Flush(); // Force terrain to update
 
-                Debug.Log("Terrain layer switched to initial terrain layer.");
-            }
-            else
-            {
-                Debug.LogError("Terrain has no layers assigned.");
+                Debug.Log("Terrain layers successfully swapped between snow (index 2) and fire (index 6).");
             }
         }
     }
@@ -208,15 +230,5 @@ public class FireOrbTrigger : MonoBehaviour
         }
 
         mountainMaterial.color = targetColor;
-    }
-
-    private bool IsTerrainLayerMatching(TerrainLayer targetLayer)
-    {
-        if (terrain != null && terrain.terrainData.terrainLayers.Length > 0)
-        {
-            TerrainLayer currentLayer = terrain.terrainData.terrainLayers[0];
-            return currentLayer == targetLayer;
-        }
-        return false;
     }
 }

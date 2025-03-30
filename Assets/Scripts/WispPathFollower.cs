@@ -33,6 +33,11 @@ public class WispPathFollower : MonoBehaviour
                     yield return new WaitUntil(() => Vector3.Distance(transform.position, player.position) < resumeRadius);
                 }
 
+                // Rotate the wisp to have its back facing forward (on the Y-axis)
+                Vector3 direction = waypoints[currentWaypoint].position - transform.position;
+                direction.y = 0; // Ignore vertical movement (we only care about the horizontal plane)
+                transform.rotation = Quaternion.LookRotation(-direction); // Face opposite direction for the back to face forward
+
                 // Move the wisp toward the waypoint
                 transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypoint].position, moveSpeed * Time.deltaTime);
                 yield return null;

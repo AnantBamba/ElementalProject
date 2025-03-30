@@ -7,13 +7,13 @@ public class SceneFadeController : MonoBehaviour
     public Image blackOverlay;  // Reference to the black screen overlay image
     private SimpleCapsuleWithStickMovement movementScript;  // Reference to the movement script
     public GameObject wisp;  // Reference to the wisp GameObject
-    public Vector3 initialPosition = new Vector3(0, 0, 2);  // Initial position of the wisp relative to CenterEyeAnchor (local)
-    public Vector3 targetPosition = new Vector3(0, 0, 5);  // Target position for the wisp relative to CenterEyeAnchor (local)
-    public float fadeDuration = 3f;  // Duration of fade-in effect
+    public Vector3 initialPosition = new Vector3(0, 0, 2);  // Initial position of the wisp in world space
+    public Vector3 targetPosition = new Vector3(0, 0, 5);  // Target position for the wisp in world space
+    public float fadeDuration = 3f;  // Duration of fade-in effect and wisp movement (same duration for both)
     public float initialBlackTime = 2f;  // How long the screen stays black before fading
-    public float wispMoveDuration = 3f;  // Duration for the wisp to move to the target position
 
     private Transform centerEyeAnchor;  // Reference to the CenterEyeAnchor transform
+    private WispPathFollower wispPathFollowerScript;  // Reference to the Wisp Path Follower script
 
     private void Start()
     {
@@ -39,15 +39,21 @@ public class SceneFadeController : MonoBehaviour
             movementScript.enabled = false;
         }
 
-        // Ensure the wisp is positioned at the initial position relative to the CenterEyeAnchor (local position)
-        if (wisp != null && centerEyeAnchor != null)
+        // Ensure the wisp is positioned at the initial position in world space
+        if (wisp != null)
         {
-            // Set the wisp position relative to the CenterEyeAnchor
-            wisp.transform.localPosition = initialPosition;
+            wisp.transform.position = initialPosition;  // Set the wisp position in world space
             Renderer wispRenderer = wisp.GetComponent<Renderer>();
             if (wispRenderer != null)
             {
                 wispRenderer.enabled = true; // Make sure the wisp is visible
+            }
+
+            // Get the Wisp Path Follower script and disable it at the start
+            wispPathFollowerScript = wisp.GetComponent<WispPathFollower>();
+            if (wispPathFollowerScript != null)
+            {
+                wispPathFollowerScript.enabled = false;  // Disable it initially
             }
         }
 
@@ -77,12 +83,19 @@ public class SceneFadeController : MonoBehaviour
             movementScript.enabled = true;
         }
 
-        // Smooth fade effect for the black screen
+        // Smooth fade effect for the black screen and wisp movement (both happen simultaneously)
         float elapsedTime = 0f;
+        Vector3 initialPos = wisp.transform.position;
+
         while (elapsedTime < fadeDuration)
         {
+            // Lerp the black screen alpha from opaque to transparent
             float alpha = Mathf.Lerp(1, 0, elapsedTime / fadeDuration);
             blackOverlay.color = new Color(0, 0, 0, alpha);
+
+            // Lerp the wisp position from the initial position to the target position
+            wisp.transform.position = Vector3.Lerp(initialPos, targetPosition, elapsedTime / fadeDuration);
+
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -91,24 +104,13 @@ public class SceneFadeController : MonoBehaviour
         blackOverlay.color = new Color(0, 0, 0, 0);
         blackOverlay.gameObject.SetActive(false);
 
-        // Start the wisp movement after the black screen transition
-        StartCoroutine(MoveWispToTarget());
-    }
-
-    private IEnumerator MoveWispToTarget()
-    {
-        // Smoothly move the wisp from the initial position to the target position
-        float moveElapsedTime = 0f;
-        Vector3 initialPos = wisp.transform.localPosition;
-
-        while (moveElapsedTime < wispMoveDuration)
-        {
-            wisp.transform.localPosition = Vector3.Lerp(initialPos, targetPosition, moveElapsedTime / wispMoveDuration);
-            moveElapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
         // Ensure the wisp reaches the target position exactly
-        wisp.transform.localPosition = targetPosition;
+        wisp.transform.position = targetPosition;
+
+        // Re-enable the Wisp Path Follower script after the transition
+        if (wispPathFollowerScript != null)
+        {
+            wispPathFollowerScript.enabled = true;  // Re-enable the Wisp Path Follower
+        }
     }
 }
