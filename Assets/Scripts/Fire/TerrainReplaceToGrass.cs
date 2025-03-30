@@ -8,9 +8,10 @@ public class TerrainReplaceToGrass : MonoBehaviour
     public float fadeSpeed = 0.01f;
     public float updateInterval = 0.05f;
     public float expansionSpeed = 5f;
-    public Vector3 worldCenter; // 扩散中心
     public float maxDistance = 100f;
+    public Transform centerTarget; // 可指定 Terrain 子物体作为扩散中心
 
+    private Vector3 worldCenter;
     private float[,,] originalAlphamaps;
     private float[,,] workingAlphamaps;
     private int width;
@@ -36,6 +37,12 @@ public class TerrainReplaceToGrass : MonoBehaviour
 
         originalAlphamaps = terrain.terrainData.GetAlphamaps(0, 0, width, height);
         workingAlphamaps = (float[,,])originalAlphamaps.Clone();
+
+        // 设置扩散中心
+        if (centerTarget != null)
+        {
+            worldCenter = centerTarget.position;
+        }
 
         currentRadius = 0f;
         InvokeRepeating(nameof(StepFadeToGrass), 0f, updateInterval);
