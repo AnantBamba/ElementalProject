@@ -9,6 +9,7 @@ TagManager:
   - AirOrb
   - WaterOrb
   - EarthOrb
+  - Orb
   layers:
   - Default
   - TransparentFX
@@ -17,7 +18,7 @@ TagManager:
   - Water
   - UI
   - Grabbable
-  - 
+  - Wisp
   - Suimono_Water
   - Suimono_Depth
   - Suimono_Screen
