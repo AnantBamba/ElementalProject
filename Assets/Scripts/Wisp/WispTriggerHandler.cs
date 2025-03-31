@@ -6,34 +6,41 @@ public class WispTriggerHandler : MonoBehaviour
 {
     public GameObject wispPrefab;  // Wisp GameObject
     public float moveSpeed = 2.0f;  // Speed of wisp movement
-    private HashSet<Collider> triggeredColliders = new HashSet<Collider>();  // Tracks triggered zones
+    public AudioClip voiceLine;  // Assign different voice lines in Unity
+
+    private AudioSource wispAudioSource;  // Wisp's AudioSource
+    private HashSet<Collider> triggeredColliders = new HashSet<Collider>();  // Track triggered zones
 
     void Start()
     {
         if (wispPrefab == null)
         {
             Debug.LogError("Wisp Prefab not assigned!");
+            return;
+        }
+
+        wispAudioSource = wispPrefab.GetComponent<AudioSource>();
+
+        if (wispAudioSource == null)
+        {
+            Debug.LogError("No AudioSource found on Wisp Prefab!");
         }
     }
 
     void OnTriggerEnter(Collider other)
     {
-        // Check if the object entering the trigger is the player
-        if (other.CompareTag("Player"))  // You can tag the player with "Player"
+        // Check if the player entered the trigger zone
+        if (other.CompareTag("Player"))
         {
-            // Debug: Log what is entering the trigger
-            Debug.Log("Player entered the trigger: " + other.gameObject.name);
+            Debug.Log("Player entered trigger: " + other.gameObject.name);
 
-            // Make sure we don't trigger the wisp movement multiple times
             if (!triggeredColliders.Contains(other))
             {
                 triggeredColliders.Add(other);  // Mark this trigger as activated
 
-                // Get the target position (where the wisp should go)
-                Vector3 targetPosition = transform.position; // Trigger zone position
+                Vector3 targetPosition = transform.position; // Move wisp to this trigger zone
                 Debug.Log("Wisp moving to: " + targetPosition);
 
-                // Start moving the wisp smoothly
                 StartCoroutine(MoveWisp(targetPosition));
             }
         }
@@ -41,40 +48,42 @@ public class WispTriggerHandler : MonoBehaviour
 
     IEnumerator MoveWisp(Vector3 targetPosition)
     {
-        // Move the wisp smoothly towards the target
+        // Move the wisp smoothly
         while (Vector3.Distance(wispPrefab.transform.position, targetPosition) > 0.1f)
         {
-            // Move the wisp
             wispPrefab.transform.position = Vector3.MoveTowards(
                 wispPrefab.transform.position,
                 targetPosition,
                 moveSpeed * Time.deltaTime
             );
 
-            // Rotate the wisp to look forward towards the target
-            Vector3 direction = targetPosition - wispPrefab.transform.position;  // Direction from wisp to target
-            if (direction != Vector3.zero)  // Avoid issues when the direction is zero
+            // Rotate the wisp toward the target
+            Vector3 direction = targetPosition - wispPrefab.transform.position;
+            if (direction != Vector3.zero)
             {
-                Quaternion rotation = Quaternion.LookRotation(direction);  // Get the rotation towards the target
-                wispPrefab.transform.rotation = Quaternion.Slerp(wispPrefab.transform.rotation, rotation, Time.deltaTime * moveSpeed);
+                Quaternion rotation = Quaternion.LookRotation(direction);
+                wispPrefab.transform.rotation = Quaternion.Slerp(
+                    wispPrefab.transform.rotation, rotation, Time.deltaTime * moveSpeed
+                );
             }
 
-            yield return null;  // Wait for the next frame
+            yield return null;
         }
 
-        // Ensure the wisp reaches the exact target position
+        // Snap wisp to exact position
         wispPrefab.transform.position = targetPosition;
         Debug.Log("Wisp reached target: " + targetPosition);
 
-        // Optionally, play sound if the trigger zone has an AudioSource
-        AudioSource triggerAudio = GetComponent<AudioSource>();
-        if (triggerAudio != null && triggerAudio.clip != null)
+        // **Now Play the Voice Line from the Wisp's Position**
+        if (voiceLine != null && wispAudioSource != null)
         {
-            triggerAudio.Play();  // Play sound after wisp arrives
+            yield return new WaitForSeconds(0.5f); // Small delay before speaking
+            wispAudioSource.clip = voiceLine;
+            wispAudioSource.Play();
         }
         else
         {
-            Debug.LogWarning("No AudioSource or AudioClip found on " + gameObject.name);
+            Debug.LogWarning("No voice line assigned or missing AudioSource on Wisp.");
         }
     }
 }
