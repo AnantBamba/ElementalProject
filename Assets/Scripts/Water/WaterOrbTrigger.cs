@@ -19,7 +19,7 @@ public class WaterOrbTrigger : MonoBehaviour
     [Header("Water Plane Rise")]
     public Transform waterPlane;
     public float riseDelay = 10f;
-    public float riseTargetY = 5f;
+    public float riseTargetY = 0f;
     public float riseDuration = 3f;
 
     [Header("Terrain Detail Expansion")]
