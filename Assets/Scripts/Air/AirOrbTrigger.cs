@@ -1,45 +1,41 @@
 using UnityEngine;
 using System.Collections;
-using Sydewa;
 using OculusSampleFramework;
 
 public class AirOrbTrigger : MonoBehaviour
 {
     public bool isAirOrbPlaced = false;
 
-    [SerializeField] private ParticleSystem fogParticleSystem;  // Reference to the fog particle system
-    public float transitionSpeed = 1.0f;
-    private Coroutine timeChangeCoroutine;
-    private ParticleSystem.MainModule fogMainModule;
-
+    [Header("Orb Snapping")]
     [SerializeField] private Vector3 localSnapPosition = new Vector3(0f, 1f, 0f);
     [SerializeField] private Vector3 localSnapRotation = new Vector3(0f, 0f, 0f);
 
+    [Header("Particle System and Audio Settings")]
+    public ParticleSystem airEffect; // Particle system for air orb effect
+    public AudioSource airSound; // Audio source to modify the volume
+    public float fadeDuration = 1.5f; // Time for the fade transitions
+
+    private bool hasActivated = false;
+    private Transform orbTransform;
+    private float originalAudioVolume;
+
     private void Start()
     {
-        if (fogParticleSystem == null)
+        if (airSound != null)
         {
-            Debug.LogError("Fog Particle System not assigned in the inspector!");
+            originalAudioVolume = airSound.volume;
         }
-
-        // Cache the main module of the fog particle system for performance optimization
-        fogMainModule = fogParticleSystem.main;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("AirOrb"))
+        if (other.CompareTag("AirOrb") && !hasActivated)
         {
             OVRGrabbable grabbable = other.GetComponent<OVRGrabbable>();
-
             if (grabbable != null && grabbable.isGrabbed)
-            {
                 StartCoroutine(WaitForRelease(grabbable));
-            }
             else
-            {
                 SnapOrbToAltar(other.gameObject);
-            }
         }
     }
 
@@ -47,82 +43,103 @@ public class AirOrbTrigger : MonoBehaviour
     {
         if (other.CompareTag("AirOrb"))
         {
-            // Air Orb has fully left the altar, smoothly fade in the fog
-            ReenableFogEffect();
+            Debug.Log("Air Orb has been removed from the Altar!");
+            isAirOrbPlaced = false;
+            hasActivated = false; // Reset hasActivated to allow snapping again
+            StartCoroutine(FadeInEffects()); // Fade in the particle system and restore audio volume
         }
-    }
-
-    private void ReenableFogEffect()
-    {
-        isAirOrbPlaced = false;
-        Debug.Log("Air Orb has been removed from the Altar!");
-
-        // Smoothly fade in the fog effect
-        StartCoroutine(SmoothFogTransition(true));
     }
 
     private IEnumerator WaitForRelease(OVRGrabbable grabbable)
     {
-        while (grabbable.isGrabbed)
-        {
-            yield return null;
-        }
-
-        if (grabbable.CompareTag("AirOrb"))
-        {
-            SnapOrbToAltar(grabbable.gameObject);
-        }
+        while (grabbable.isGrabbed) yield return null;
+        if (grabbable.CompareTag("AirOrb")) SnapOrbToAltar(grabbable.gameObject);
     }
 
     private void SnapOrbToAltar(GameObject orb)
     {
-        Vector3 worldSnapPosition = transform.TransformPoint(localSnapPosition);
-        Quaternion worldSnapRotation = transform.rotation * Quaternion.Euler(localSnapRotation);
+        orb.transform.position = transform.TransformPoint(localSnapPosition);
+        orb.transform.rotation = transform.rotation * Quaternion.Euler(localSnapRotation);
 
-        orb.transform.position = worldSnapPosition;
-        orb.transform.rotation = worldSnapRotation;
-
-        Rigidbody orbRb = orb.GetComponent<Rigidbody>();
-        if (orbRb != null)
-        {
-            orbRb.isKinematic = true;
-        }
+        var rb = orb.GetComponent<Rigidbody>();
+        if (rb != null) rb.isKinematic = true;
 
         isAirOrbPlaced = true;
-        Debug.Log("Air Orb has been placed on the Altar!");
+        hasActivated = true; // Set hasActivated to true to prevent re-snapping
+        orbTransform = orb.transform;
 
-        // Smoothly fade out the fog effect when the orb is placed
-        StartCoroutine(SmoothFogTransition(false));
+        StartCoroutine(FadeOutEffects()); // Fade out the particle system and audio when the orb is placed
     }
 
-    // Coroutine to handle smooth fog fade-in and fade-out
-    private IEnumerator SmoothFogTransition(bool fadeIn)
+    private IEnumerator FadeOutEffects()
     {
-        float targetSize = fadeIn ? 1f : 0f;  // Target size of the fog
-        float startTime = Time.time;
-        float startSize = fogMainModule.startSize.constant;
-
-        // If fading in, ensure the fog is not stopped completely
-        if (fadeIn)
+        // Fade the particle system
+        if (airEffect != null)
         {
-            fogParticleSystem.Play();
-        }
-        else
-        {
-            fogParticleSystem.Stop();
-        }
+            var main = airEffect.main;
+            float startTime = Time.time;
 
-        // Smoothly transition the fog's size (or opacity if you modify other properties)
-        while (Mathf.Abs(fogMainModule.startSize.constant - targetSize) > 0.01f)
-        {
-            float t = (Time.time - startTime) * transitionSpeed;
-            float size = Mathf.Lerp(startSize, targetSize, t);
+            while (Time.time - startTime < fadeDuration)
+            {
+                float t = (Time.time - startTime) / fadeDuration;
+                main.startColor = new Color(main.startColor.color.r, main.startColor.color.g, main.startColor.color.b, Mathf.Lerp(1f, 0f, t));
+                yield return null;
+            }
 
-            fogMainModule.startSize = new ParticleSystem.MinMaxCurve(size);  // Update size or opacity
-            yield return null;
+            main.startColor = new Color(main.startColor.color.r, main.startColor.color.g, main.startColor.color.b, 0f);
+            airEffect.Stop();
         }
 
-        // Finalize the size to ensure it is exactly at the target value
-        fogMainModule.startSize = new ParticleSystem.MinMaxCurve(targetSize);
+        // Fade the audio
+        if (airSound != null)
+        {
+            float startVolume = airSound.volume;
+            float startTime = Time.time;
+
+            while (Time.time - startTime < fadeDuration)
+            {
+                float t = (Time.time - startTime) / fadeDuration;
+                airSound.volume = Mathf.Lerp(startVolume, 0f, t);
+                yield return null;
+            }
+
+            airSound.volume = 0f;
+        }
+    }
+
+    private IEnumerator FadeInEffects()
+    {
+        // Fade the particle system
+        if (airEffect != null)
+        {
+            var main = airEffect.main;
+            float startTime = Time.time;
+
+            while (Time.time - startTime < fadeDuration)
+            {
+                float t = (Time.time - startTime) / fadeDuration;
+                main.startColor = new Color(main.startColor.color.r, main.startColor.color.g, main.startColor.color.b, Mathf.Lerp(0f, 1f, t));
+                yield return null;
+            }
+
+            main.startColor = new Color(main.startColor.color.r, main.startColor.color.g, main.startColor.color.b, 1f);
+            airEffect.Play();
+        }
+
+        // Fade the audio
+        if (airSound != null)
+        {
+            float startVolume = airSound.volume;
+            float startTime = Time.time;
+
+            while (Time.time - startTime < fadeDuration)
+            {
+                float t = (Time.time - startTime) / fadeDuration;
+                airSound.volume = Mathf.Lerp(startVolume, originalAudioVolume, t);
+                yield return null;
+            }
+
+            airSound.volume = originalAudioVolume;
+        }
     }
 }
