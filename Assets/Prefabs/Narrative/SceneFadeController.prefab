@@ -45,8 +45,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blackOverlay: {fileID: 0}
-  wisp: {fileID: 0}
-  initialPosition: {x: -20, y: -6, z: -7.9}
-  targetPosition: {x: -15, y: -6, z: -8}
   fadeDuration: 3
   initialBlackTime: 5
