@@ -117,17 +117,31 @@ public class AltarTriggerHandler : MonoBehaviour
                 Debug.LogWarning("No AudioSource or AudioClip found on " + gameObject.name);
             }
 
-            // Stop the scene after sound is played
-            StopScene();
+            // Start StopScene() coroutine
+            StartCoroutine(StopScene());  // ? FIXED: Start coroutine properly
         }
     }
 
-    // Stop the scene (for example, you could disable the game or load a new scene, etc.)
-    void StopScene()
+    IEnumerator StopScene()
     {
-        Debug.Log("All orbs are placed! Stopping the scene...");
-        // You can either stop time, disable gameplay, or load a new scene here.
-        Time.timeScale = 0;  // This will stop time, pausing the game.
-        // Alternatively, you can load another scene here using SceneManager.LoadScene() if necessary.
+        Debug.Log("All orbs are placed! Playing sound before quitting...");
+
+        AudioSource triggerAudio = GetComponent<AudioSource>();
+
+        if (triggerAudio != null && triggerAudio.clip != null)
+        {
+            yield return new WaitForSeconds(triggerAudio.clip.length); // Wait for the sound to finish
+        }
+        else
+        {
+            Debug.LogWarning("No AudioSource or AudioClip found, quitting immediately.");
+        }
+
+        // Quit application after the sound has played
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }
