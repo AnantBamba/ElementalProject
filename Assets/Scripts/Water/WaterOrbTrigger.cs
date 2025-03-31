@@ -1,4 +1,3 @@
-// WaterOrbTrigger.cs
 using UnityEngine;
 using System.Collections;
 using OculusSampleFramework;
@@ -22,17 +21,31 @@ public class WaterOrbTrigger : MonoBehaviour
     public float riseTargetY = 5f;
     public float riseDuration = 3f;
 
-    [Header("Terrain Detail Expansion")]
-    public TerrainDetailExpander terrainDetailExpander;
-    public float terrainTriggerDelay = 15f;
+    [Header("Target Object")]
+    public GameObject targetObject; // The object to disable/enable with fade effect
+    public float fadeSpeed = 1.0f;
 
     private bool hasActivated = false;
     private Transform orbTransform;
+    private float originalAudioVolume;
 
     private void Start()
     {
-        if (rainEffect != null && rainEffect.isPlaying) rainEffect.Stop();
-        if (rainAudio != null && rainAudio.isPlaying) rainAudio.Stop();
+        if (rainAudio != null)
+        {
+            originalAudioVolume = rainAudio.volume;
+        }
+
+        // Start rain at the beginning of the scene
+        if (rainEffect != null)
+        {
+            rainEffect.Play();
+            Debug.Log("Rain started at scene start.");
+        }
+        if (rainAudio != null)
+        {
+            rainAudio.Play();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -53,6 +66,9 @@ public class WaterOrbTrigger : MonoBehaviour
         {
             Debug.Log("Water Orb has been removed from the Altar!");
             isWaterOrbPlaced = false;
+            hasActivated = false; // Allow snapping again
+            ReenableTargetObject();
+            StartCoroutine(FadeInEffects()); // Restart rain when orb is removed
         }
     }
 
@@ -74,15 +90,94 @@ public class WaterOrbTrigger : MonoBehaviour
         hasActivated = true;
         orbTransform = orb.transform;
 
+        if (targetObject != null) targetObject.SetActive(false);
+
+        StartCoroutine(FadeOutEffects()); // Stop rain when orb is placed
         StartCoroutine(HandleWaterSequence());
+    }
+
+    private void ReenableTargetObject()
+    {
+        if (targetObject != null)
+        {
+            targetObject.SetActive(true);
+        }
+    }
+
+    private IEnumerator FadeOutEffects()
+    {
+        if (rainEffect != null)
+        {
+            var main = rainEffect.main;
+            float startTime = Time.time;
+
+            while (Time.time - startTime < rainDuration)
+            {
+                float t = (Time.time - startTime) / rainDuration;
+                main.startColor = new Color(main.startColor.color.r, main.startColor.color.g, main.startColor.color.b, Mathf.Lerp(1f, 0f, t));
+                yield return null;
+            }
+
+            main.startColor = new Color(main.startColor.color.r, main.startColor.color.g, main.startColor.color.b, 0f);
+            rainEffect.Stop();
+            Debug.Log("Rain stopped.");
+        }
+
+        if (rainAudio != null)
+        {
+            float startVolume = rainAudio.volume;
+            float startTime = Time.time;
+
+            while (Time.time - startTime < rainDuration)
+            {
+                float t = (Time.time - startTime) / rainDuration;
+                rainAudio.volume = Mathf.Lerp(startVolume, 0f, t);
+                yield return null;
+            }
+
+            rainAudio.volume = 0f;
+            rainAudio.Stop();
+        }
+    }
+
+    private IEnumerator FadeInEffects()
+    {
+        if (rainEffect != null)
+        {
+            var main = rainEffect.main;
+            float startTime = Time.time;
+
+            while (Time.time - startTime < rainDuration)
+            {
+                float t = (Time.time - startTime) / rainDuration;
+                main.startColor = new Color(main.startColor.color.r, main.startColor.color.g, main.startColor.color.b, Mathf.Lerp(0f, 1f, t));
+                yield return null;
+            }
+
+            main.startColor = new Color(main.startColor.color.r, main.startColor.color.g, main.startColor.color.b, 1f);
+            rainEffect.Play();
+            Debug.Log("Rain restarted.");
+        }
+
+        if (rainAudio != null)
+        {
+            float startVolume = rainAudio.volume;
+            float startTime = Time.time;
+
+            while (Time.time - startTime < rainDuration)
+            {
+                float t = (Time.time - startTime) / rainDuration;
+                rainAudio.volume = Mathf.Lerp(startVolume, originalAudioVolume, t);
+                yield return null;
+            }
+
+            rainAudio.volume = originalAudioVolume;
+            rainAudio.Play();
+        }
     }
 
     private IEnumerator HandleWaterSequence()
     {
-        float rainStartTime = Time.time;
-        if (rainEffect != null) rainEffect.Play();
-        if (rainAudio != null) rainAudio.Play();
-
         yield return new WaitForSeconds(riseDelay);
 
         if (waterPlane != null)
@@ -98,17 +193,5 @@ public class WaterOrbTrigger : MonoBehaviour
             }
             waterPlane.position = end;
         }
-
-        float timeSinceRainStart = Time.time - rainStartTime;
-        yield return new WaitForSeconds(Mathf.Max(0, terrainTriggerDelay - timeSinceRainStart));
-
-        if (terrainDetailExpander != null && orbTransform != null)
-            terrainDetailExpander.StartDetailExpansion(orbTransform);
-
-        float totalTime = Time.time - rainStartTime;
-        yield return new WaitForSeconds(Mathf.Max(0, rainDuration - totalTime));
-
-        if (rainEffect != null) rainEffect.Stop();
-        if (rainAudio != null) rainAudio.Stop();
     }
 }

@@ -22,6 +22,9 @@ public class FireOrbTrigger : MonoBehaviour
     [SerializeField] private Vector3 localSnapPosition = new Vector3(0f, 1f, 0f);
     [SerializeField] private Vector3 localSnapRotation = new Vector3(0f, 0f, 0f);
 
+    [Header("Target Object")]
+    public GameObject targetObject; // The object to disable/enable with no transition
+
     private void Start()
     {
         if (lightingManager == null)
@@ -47,7 +50,6 @@ public class FireOrbTrigger : MonoBehaviour
             mountainMaterial.color = initialMountainColor;
         }
 
-        // Ensure the terrain layers are set up correctly at the start
         SetUpInitialTerrainLayers();
     }
 
@@ -58,18 +60,16 @@ public class FireOrbTrigger : MonoBehaviour
             TerrainData terrainData = terrain.terrainData;
             TerrainLayer[] layers = terrainData.terrainLayers;
 
-            // Ensure there are at least 7 layers, and swap snow and fire layers
-            if (layers.Length < 7) // We need at least 7 layers to have fire at index 6
+            if (layers.Length < 7)
             {
                 Debug.LogError("Terrain does not have enough layers. Adding missing layers...");
                 TerrainLayer[] newLayers = new TerrainLayer[7];
-                newLayers[2] = initialTerrainLayer; // Snow layer at index 2
-                newLayers[6] = fireTerrainLayer; // Fire layer at index 6
+                newLayers[2] = initialTerrainLayer;
+                newLayers[6] = fireTerrainLayer;
                 terrainData.terrainLayers = newLayers;
             }
             else
             {
-                // Ensure fire layer is at index 6 and snow layer is at index 2
                 if (layers[6] != fireTerrainLayer)
                 {
                     layers[6] = fireTerrainLayer;
@@ -83,8 +83,8 @@ public class FireOrbTrigger : MonoBehaviour
                 }
 
                 terrainData.terrainLayers = layers;
-                terrain.terrainData.RefreshPrototypes(); // Refresh texture prototypes
-                terrain.Flush(); // Force terrain to update
+                terrain.terrainData.RefreshPrototypes();
+                terrain.Flush();
 
                 Debug.Log("Terrain layers initialized.");
             }
@@ -112,8 +112,9 @@ public class FireOrbTrigger : MonoBehaviour
         if (other.CompareTag("FireOrb"))
         {
             ResetTime();
-            SwapTerrainLayers();  // Swap the terrain layers when orb is removed
-            StartColorTransition(initialMountainColor);   // Smoothly transition back to the initial mountain color
+            SwapTerrainLayers();
+            StartColorTransition(initialMountainColor);
+            ReenableTargetObject(); // Immediately re-enable the target object without transition
         }
     }
 
@@ -179,9 +180,14 @@ public class FireOrbTrigger : MonoBehaviour
         Debug.Log("Fire Orb has been placed on the Altar!");
         StartTransition(12f);
 
-        // Switch to the fire terrain layer and the fire orb color when orb is placed
         SwapTerrainLayers();
         StartColorTransition(fireOrbMountainColor);
+
+        // Immediately disable the target object without fading
+        if (targetObject != null)
+        {
+            targetObject.SetActive(false);
+        }
     }
 
     private void SwapTerrainLayers()
@@ -191,16 +197,15 @@ public class FireOrbTrigger : MonoBehaviour
             TerrainData terrainData = terrain.terrainData;
             TerrainLayer[] layers = terrainData.terrainLayers;
 
-            if (layers.Length > 6) // Ensure there are at least 7 layers
+            if (layers.Length > 6)
             {
-                // Swap the snow layer (index 2) and fire layer (index 6)
                 TerrainLayer tempLayer = layers[2];
                 layers[2] = layers[6];
                 layers[6] = tempLayer;
 
                 terrainData.terrainLayers = layers;
-                terrain.terrainData.RefreshPrototypes(); // Refresh texture prototypes
-                terrain.Flush(); // Force terrain to update
+                terrain.terrainData.RefreshPrototypes();
+                terrain.Flush();
 
                 Debug.Log("Terrain layers successfully swapped between snow (index 2) and fire (index 6).");
             }
@@ -219,8 +224,6 @@ public class FireOrbTrigger : MonoBehaviour
     private IEnumerator SmoothColorTransition(Color targetColor)
     {
         Color currentColor = mountainMaterial.color;
-
-        // Smoothly interpolate the color change
         float timeElapsed = 0f;
         while (timeElapsed < transitionSpeed)
         {
@@ -230,5 +233,14 @@ public class FireOrbTrigger : MonoBehaviour
         }
 
         mountainMaterial.color = targetColor;
+    }
+
+    private void ReenableTargetObject()
+    {
+        if (targetObject != null)
+        {
+            // Immediately re-enable the target object without fading
+            targetObject.SetActive(true);
+        }
     }
 }

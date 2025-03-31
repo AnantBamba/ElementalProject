@@ -7,12 +7,15 @@ public class SceneFadeController : MonoBehaviour
     public Image blackOverlay;  // Reference to the black screen overlay image
     private SimpleCapsuleWithStickMovement movementScript;  // Reference to the movement script
     public GameObject wisp;  // Reference to the wisp GameObject
+    public GameObject altarCollision;  // Reference to the AltarCollision GameObject
     public Vector3 initialPosition = new Vector3(0, 0, 2);  // Initial position of the wisp in world space
     public Vector3 targetPosition = new Vector3(0, 0, 5);  // Target position for the wisp in world space
     public float fadeDuration = 3f;  // Duration of fade-in effect and wisp movement (same duration for both)
-    public float initialBlackTime = 2f;  // How long the screen stays black before fading
+    public AudioClip audioClip;  // The audio clip to play at the start
 
     private Transform centerEyeAnchor;  // Reference to the CenterEyeAnchor transform
+    private AudioSource audioSource;  // Reference to the AudioSource component
+    private float initialBlackTime;  // Duration the screen stays black before fading
 
     private void Start()
     {
@@ -49,8 +52,15 @@ public class SceneFadeController : MonoBehaviour
             }
         }
 
-        // Start the fade-in process
-        StartCoroutine(FadeIn());
+        // Add and configure the AudioSource component
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = audioClip;
+
+        // Set the initial black screen time to the length of the audio clip
+        initialBlackTime = audioClip.length;
+
+        // Start the audio and wait for it to finish before starting the transition
+        StartCoroutine(PlayAudioAndStartTransition());
     }
 
     private void ResetRotation()
@@ -64,9 +74,27 @@ public class SceneFadeController : MonoBehaviour
         }
     }
 
+    private IEnumerator PlayAudioAndStartTransition()
+    {
+        // Play the audio
+        audioSource.Play();
+
+        // Wait for the audio to finish before starting the transition
+        yield return new WaitForSeconds(audioSource.clip.length);
+
+        // Start the fade-in process
+        StartCoroutine(FadeIn());
+    }
+
     private IEnumerator FadeIn()
     {
-        // Wait for the initial black screen duration
+        // Disable the AltarCollision GameObject before the transition
+        if (altarCollision != null)
+        {
+            altarCollision.SetActive(false);
+        }
+
+        // Wait for the initial black screen duration (this now matches the audio length)
         yield return new WaitForSeconds(initialBlackTime);
 
         // Enable movement script just before fading starts
@@ -98,5 +126,11 @@ public class SceneFadeController : MonoBehaviour
 
         // Ensure the wisp reaches the target position exactly
         wisp.transform.position = targetPosition;
+
+        // Re-enable the AltarCollision GameObject after the transition
+        if (altarCollision != null)
+        {
+            altarCollision.SetActive(true);
+        }
     }
 }
