@@ -10,7 +10,6 @@ TagManager:
   - WaterOrb
   - EarthOrb
   - Orb
-  - WispTrigger
   layers:
   - Default
   - TransparentFX
@@ -23,7 +22,7 @@ TagManager:
   - Suimono_Water
   - Suimono_Depth
   - Suimono_Screen
-  - Tree
+  - 
   - 
   - 
   - 

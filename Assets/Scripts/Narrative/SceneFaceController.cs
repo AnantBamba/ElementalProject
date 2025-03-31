@@ -13,6 +13,7 @@ public class SceneFadeController : MonoBehaviour
     public float initialBlackTime = 2f;  // How long the screen stays black before fading
 
     private Transform centerEyeAnchor;  // Reference to the CenterEyeAnchor transform
+    private WispPathFollower wispPathFollowerScript;  // Reference to the Wisp Path Follower script
 
     private void Start()
     {
@@ -46,6 +47,13 @@ public class SceneFadeController : MonoBehaviour
             if (wispRenderer != null)
             {
                 wispRenderer.enabled = true; // Make sure the wisp is visible
+            }
+
+            // Get the Wisp Path Follower script and disable it at the start
+            wispPathFollowerScript = wisp.GetComponent<WispPathFollower>();
+            if (wispPathFollowerScript != null)
+            {
+                wispPathFollowerScript.enabled = false;  // Disable it initially
             }
         }
 
@@ -98,5 +106,11 @@ public class SceneFadeController : MonoBehaviour
 
         // Ensure the wisp reaches the target position exactly
         wisp.transform.position = targetPosition;
+
+        // Re-enable the Wisp Path Follower script after the transition
+        if (wispPathFollowerScript != null)
+        {
+            wispPathFollowerScript.enabled = true;  // Re-enable the Wisp Path Follower
+        }
     }
 }
