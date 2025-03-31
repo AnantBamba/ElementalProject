@@ -1,56 +1,36 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class FootstepAudioSwitcherTerrain : MonoBehaviour
 {
-    [System.Serializable]
-    public class TerrainFootstep
-    {
-        public int terrainLayerIndex;    // 地形图层编号，例如 2 = 雪，5 = 草
-        public AudioClip footstepClip;   // 对应音效
-    }
-
     public AudioSource audioSource;
+
+    [Header("Footstep Clips by Terrain Index")]
+    public AudioClip[] footstepClips; // Index 0 = grass, 1 = snow, etc.
+
+    [Header("References")]
     public CharacterController characterController;
     public Terrain terrain;
 
-    [Header("Footstep Clips Mapping")]
-    public TerrainFootstep[] footstepMappings;
-
     public float movementThreshold = 0.1f;
     private bool isMoving = false;
-    private int currentLayerIndex = -1;
-    private Dictionary<int, AudioClip> layerToClip;
-
-    void Start()
-    {
-        // 构建映射字典
-        layerToClip = new Dictionary<int, AudioClip>();
-        foreach (var mapping in footstepMappings)
-        {
-            if (!layerToClip.ContainsKey(mapping.terrainLayerIndex))
-                layerToClip.Add(mapping.terrainLayerIndex, mapping.footstepClip);
-        }
-    }
+    private int currentTerrainIndex = -1;
 
     void Update()
     {
-        if (terrain == null || characterController == null || audioSource == null) return;
+        if (terrain == null || audioSource == null || characterController == null) return;
 
         bool movingNow = characterController.velocity.magnitude > movementThreshold;
 
         int terrainIndex = GetMainTextureIndexUnderFoot();
-
-        // 切换音效
-        if (terrainIndex != currentLayerIndex)
+        if (terrainIndex != currentTerrainIndex)
         {
-            currentLayerIndex = terrainIndex;
+            currentTerrainIndex = terrainIndex;
             UpdateFootstepClip(terrainIndex);
         }
 
         if (movingNow && !isMoving)
         {
-            if (audioSource.clip != null) audioSource.Play();
+            audioSource.Play();
         }
         else if (!movingNow && isMoving)
         {
@@ -60,41 +40,35 @@ public class FootstepAudioSwitcherTerrain : MonoBehaviour
         isMoving = movingNow;
     }
 
-    void UpdateFootstepClip(int terrainIndex)
+    void UpdateFootstepClip(int index)
     {
-        if (layerToClip.ContainsKey(terrainIndex))
-        {
-            if (audioSource.isPlaying) audioSource.Stop();
-            audioSource.clip = layerToClip[terrainIndex];
-            audioSource.loop = true;
-        }
-        else
-        {
-            audioSource.Stop(); // 未知地形就别播放脚步声
-            audioSource.clip = null;
-        }
+        if (index < 0 || index >= footstepClips.Length) return;
+
+        if (audioSource.isPlaying) audioSource.Stop();
+        audioSource.clip = footstepClips[index];
+        audioSource.loop = true;
     }
 
     int GetMainTextureIndexUnderFoot()
     {
-        Vector3 pos = transform.position;
+        Vector3 playerPos = transform.position;
         Vector3 terrainPos = terrain.transform.position;
         TerrainData tData = terrain.terrainData;
 
-        int mapX = (int)(((pos.x - terrainPos.x) / tData.size.x) * tData.alphamapWidth);
-        int mapZ = (int)(((pos.z - terrainPos.z) / tData.size.z) * tData.alphamapHeight);
+        int mapX = (int)(((playerPos.x - terrainPos.x) / tData.size.x) * tData.alphamapWidth);
+        int mapZ = (int)(((playerPos.z - terrainPos.z) / tData.size.z) * tData.alphamapHeight);
 
         float[,,] splatmapData = tData.GetAlphamaps(mapX, mapZ, 1, 1);
 
         int maxIndex = 0;
-        float maxMix = 0f;
+        float maxMix = 0;
 
         for (int i = 0; i < splatmapData.GetLength(2); i++)
         {
             if (splatmapData[0, 0, i] > maxMix)
             {
-                maxMix = splatmapData[0, 0, i];
                 maxIndex = i;
+                maxMix = splatmapData[0, 0, i];
             }
         }
 
