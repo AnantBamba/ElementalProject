@@ -30,8 +30,8 @@ Transform:
   m_GameObject: {fileID: 9148579435055762352}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -16.81, y: -16.05, z: -34.67}
-  m_LocalScale: {x: 10.243, y: 10.243, z: 10.243}
+  m_LocalPosition: {x: 10, y: -10, z: -15}
+  m_LocalScale: {x: 20, y: 10, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -51,7 +51,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9148579435055762352}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -120,7 +120,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wispPrefab: {fileID: 0}
-  moveSpeed: 5
+  moveSpeed: 10
 --- !u!82 &8810954828688051674
 AudioSource:
   m_ObjectHideFlags: 0
